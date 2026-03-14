@@ -442,7 +442,6 @@ class SummaryState extends State<Summary> {
 
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    final Result show = Result.fromJson(tvShow);
     final String heroImage = _heroImageForTab(widget.title);
     return StreamBuilder(
       stream: bloc.allMovies,
@@ -450,6 +449,10 @@ class SummaryState extends State<Summary> {
         if (snapshot.hasData) {
           final data = snapshot.data!;
           final allResults = _flattenResults(data);
+          
+          // Use the first item from the first section as our Hero, or fallback to constants
+          final Result heroShow = allResults.isNotEmpty ? allResults.first : Result.fromJson(tvShow);
+          
           final List<Widget> sections = <Widget>[];
           if (widget.title != 'Search') {
             for (final section in data) {
@@ -537,40 +540,16 @@ class SummaryState extends State<Summary> {
               'assets/images/1.jpg',
               'assets/images/2.jpg',
               'assets/images/3.jpg',
-              'assets/images/default-image.png',
+              'assets/images/end_game.jpg',
+              'assets/images/iron_man.jpg',
+              'assets/images/no_way_home.jpg',
+              'assets/images/love_and_thunder.jpg',
               'assets/images/Netflix-logo.png',
-              'assets/images/netflix_icon.png',
-              'assets/images/1.5x/netflix_icon.png',
-              'assets/images/2.0x/netflix_icon.png',
-              'assets/images/3.0x/netflix_icon.png',
-              'assets/images/4.0x/netflix_icon.png',
               'assets/images/user.png',
             ];
 
-            final List<String> screenshotsGallery = [
-              'screenshots/explore.gif',
-              'screenshots/flutter_01.png',
-              'screenshots/flutter_02.png',
-              'screenshots/flutter_03.png',
-              'screenshots/flutter_04.png',
-              'screenshots/info.gif',
-              'screenshots/intro-video.gif',
-              'screenshots/splash.gif',
-              'screenshots/video-interaction.gif',
-            ];
-
-            sections.add(_buildGallerySection('App Preview', [
-              'screenshots/flutter_01.png',
-              'screenshots/flutter_02.png',
-              'screenshots/flutter_03.png',
-              'screenshots/flutter_04.png',
-            ]));
             sections.add(
-              _buildGallerySection('Assets Gallery', assetsGallery, height: 120),
-            );
-            sections.add(
-              _buildGallerySection('Screenshots Gallery', screenshotsGallery,
-                  height: 140),
+              _buildGallerySection('App Assets', assetsGallery, height: 120),
             );
             sections.add(_buildInfoCard(
               'Profile',
@@ -658,7 +637,7 @@ class SummaryState extends State<Summary> {
                                       ),
                                     ),
                                     child: Text(
-                                      tvShow['name'].replaceAll(' ', '\n'),
+                                      heroShow.name.replaceAll(' ', '\n'),
                                       maxLines: 3,
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
@@ -672,7 +651,7 @@ class SummaryState extends State<Summary> {
                                 ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: renderMainGenres(show),
+                                  children: renderMainGenres(heroShow),
                                 ),
                                 Container(
                                   padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -684,12 +663,12 @@ class SummaryState extends State<Summary> {
                                         child: Column(
                                           children: <Widget>[
                                             Icon(
-                                              _myListIds.contains(show.id)
+                                              _myListIds.contains(heroShow.id)
                                                   ? Icons.check
                                                   : Icons.add,
                                             ),
                                             Text(
-                                              _myListIds.contains(show.id)
+                                              _myListIds.contains(heroShow.id)
                                                   ? 'Added'
                                                   : 'My List',
                                               style: TextStyle(
@@ -698,7 +677,7 @@ class SummaryState extends State<Summary> {
                                             ),
                                           ],
                                         ),
-                                        onPressed: () => _toggleMyList(show.id),
+                                        onPressed: () => _toggleMyList(heroShow.id),
                                       ),
                                       ElevatedButton(
                                         style: ElevatedButton.styleFrom(
@@ -717,7 +696,7 @@ class SummaryState extends State<Summary> {
                                             ),
                                           ],
                                         ),
-                                        onPressed: () => showTrailer(show),
+                                        onPressed: () => showTrailer(heroShow),
                                       ),
                                       TextButton(
                                         style: TextButton.styleFrom(foregroundColor: Colors.white),
@@ -732,7 +711,7 @@ class SummaryState extends State<Summary> {
                                             ),
                                           ],
                                         ),
-                                        onPressed: () => goToDetail(show, 99),
+                                        onPressed: () => goToDetail(heroShow, 99),
                                       ),
                                     ],
                                   ),

@@ -3,30 +3,46 @@ part of netflix;
 class SplashState extends State<Home> {
   late VideoPlayerController _controller;
   bool _initialized = false;
+  Timer? _fallbackTimer;
 
   @override
   void initState() {
     super.initState();
+    
+    // Fallback timer: Go to Home after 6 seconds no matter what
+    _fallbackTimer = Timer(Duration(seconds: 6), _goToHome);
+
     _controller = VideoPlayerController.asset('assets/video/netflix_intro.mp4')
       ..initialize().then((_) {
+        if (!mounted) return;
         setState(() {
           _initialized = true;
         });
         _controller.play();
+      }).catchError((error) {
+        print("Video play error: $error");
+        _goToHome();
       });
 
     _controller.addListener(() {
-      if (_controller.value.position >= _controller.value.duration) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => MainHome(title: widget.title)),
-        );
+      if (_controller.value.position >= _controller.value.duration && _controller.value.duration != Duration.zero) {
+        _goToHome();
       }
     });
+  }
+
+  void _goToHome() {
+    if (!mounted) return;
+    _fallbackTimer?.cancel();
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (context) => MainHome(title: widget.title)),
+    );
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _fallbackTimer?.cancel();
     super.dispose();
   }
 
@@ -40,7 +56,9 @@ class SplashState extends State<Home> {
                 aspectRatio: _controller.value.aspectRatio,
                 child: VideoPlayer(_controller),
               )
-            : Container(),
+            : CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+              ),
       ),
     );
   }

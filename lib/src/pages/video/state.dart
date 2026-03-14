@@ -4,6 +4,7 @@ class VideoState extends State<Video> {
   late VideoPlayerController vcontroller;
   late bool controlVisible;
   Timer? timer;
+  Timer? _introTimeout;
   bool _playingIntro = true;
 
   @override
@@ -11,11 +12,17 @@ class VideoState extends State<Video> {
     controlVisible = false; // Hide controls during intro
     vcontroller = VideoPlayerController.asset('assets/video/netflix_intro.mp4')
       ..initialize().then((_) {
+        if (!mounted) return;
         setState(() {});
         vcontroller.play();
       });
 
     vcontroller.addListener(_introListener);
+    
+    // Safety timeout for intro: 5 seconds max
+    _introTimeout = Timer(Duration(seconds: 5), () {
+      if (_playingIntro) _startMainVideo();
+    });
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
@@ -24,14 +31,17 @@ class VideoState extends State<Video> {
   }
 
   void _introListener() {
-    if (_playingIntro && vcontroller.value.position >= vcontroller.value.duration) {
-      vcontroller.removeListener(_introListener);
+    if (_playingIntro && vcontroller.value.position >= vcontroller.value.duration && vcontroller.value.duration != Duration.zero) {
       _startMainVideo();
     }
   }
 
   void _startMainVideo() {
+    if (!mounted) return;
+    _introTimeout?.cancel();
+    vcontroller.removeListener(_introListener);
     vcontroller.dispose();
+    
     setState(() {
       _playingIntro = false;
       controlVisible = true;
@@ -45,6 +55,7 @@ class VideoState extends State<Video> {
     }
 
     vcontroller.initialize().then((_) {
+      if (!mounted) return;
       setState(() {});
       vcontroller.play();
       autoHide();
@@ -52,12 +63,8 @@ class VideoState extends State<Video> {
   }
 
   @override
-  void deactivate() {
-    super.deactivate();
-  }
-
-  @override
   void dispose() {
+    _introTimeout?.cancel();
     vcontroller.dispose();
     timer?.cancel();
     SystemChrome.setPreferredOrientations([
