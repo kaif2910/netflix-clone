@@ -12,7 +12,7 @@ class SplashState extends State<Home> {
     // Fallback timer: Go to Home after 6 seconds no matter what
     _fallbackTimer = Timer(Duration(seconds: 6), _goToHome);
 
-    _controller = VideoPlayerController.asset('assets/video/netflix_intro.mp4')
+    _controller = VideoPlayerController.asset('assets/video/promo.mp4')
       ..initialize().then((_) {
         if (!mounted) return;
         setState(() {

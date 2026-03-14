@@ -34,9 +34,7 @@ flutter:
    - assets/images/2.0x/netflix_icon.png
    - assets/images/3.0x/netflix_icon.png
    - assets/images/4.0x/netflix_icon.png
-   - assets/images/user.png
    - assets/video/promo.mp4
-   - assets/video/netflix_intro.mp4
    - assets/video/end_game.mp4
    - assets/video/iron_man.mp4
    - assets/video/no_way_home.mp4

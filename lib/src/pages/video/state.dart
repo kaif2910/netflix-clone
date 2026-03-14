@@ -10,7 +10,7 @@ class VideoState extends State<Video> {
   @override
   void initState() {
     controlVisible = false; // Hide controls during intro
-    vcontroller = VideoPlayerController.asset('assets/video/netflix_intro.mp4')
+    vcontroller = VideoPlayerController.asset('assets/video/promo.mp4')
       ..initialize().then((_) {
         if (!mounted) return;
         setState(() {});

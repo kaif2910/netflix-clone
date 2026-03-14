@@ -100,29 +100,10 @@ class MovieApiProvider {
       );
     }).toList();
 
-    final localPosters = [
-      'assets/images/1.jpg',
-      'assets/images/2.jpg',
-      'assets/images/3.jpg',
-      'screenshots/flutter_01.png',
-      'screenshots/flutter_02.png',
-      'screenshots/flutter_03.png',
-      'screenshots/flutter_04.png',
-    ];
-
-    final otherItems = List.generate(localPosters.length, (index) {
-      final clone = Map<String, dynamic>.from(tvShow);
-      clone['id'] = 200 + index;
-      clone['name'] = 'Classic ${index + 1}';
-      clone['image'] = localPosters[index];
-      return clone;
-    });
-
     return [
       {'title': 'Marvel Cinematic Universe', 'items': marvelItems},
-      {'title': 'Trending Now', 'items': otherItems},
-      {'title': 'New Releases', 'items': otherItems.reversed.toList()},
-      {'title': 'Top Picks For You', 'items': marvelItems.reversed.toList()},
+      {'title': 'Trending Now', 'items': marvelItems.reversed.toList()},
+      {'title': 'Top Picks For You', 'items': marvelItems.skip(1).toList()},
     ];
   }
 }
