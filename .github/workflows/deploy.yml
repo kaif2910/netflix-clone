@@ -23,7 +23,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Web
-        run: flutter build web --release --base-href "/--SUPERHERO-FAN-HUB/" --web-renderer html
+        run: flutter build web --release --base-href "/superhero-fan-hub/" --web-renderer html
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
