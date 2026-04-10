@@ -2,45 +2,26 @@ part of marvel_cinema;
 
 class VideoState extends State<Video> {
   late VideoPlayerController? vcontroller;
-  late YoutubePlayerController? ycontroller;
   late bool controlVisible;
   Timer? timer;
-  bool isYoutube = false;
 
   @override
   void initState() {
     controlVisible = true;
-    isYoutube = widget.videoUrl.contains('youtube.com') || widget.videoUrl.contains('youtu.be');
 
-    if (isYoutube) {
-      vcontroller = null;
-      final videoId = YoutubePlayerController.convertUrlToId(widget.videoUrl);
-      ycontroller = YoutubePlayerController.fromVideoId(
-        videoId: videoId ?? '',
-        autoPlay: true,
-        params: const YoutubePlayerParams(
-          showControls: true,
-          showFullscreenButton: true,
-          mute: false,
-          loop: false,
-        ),
-      );
+    if (widget.videoUrl.startsWith('http')) {
+      vcontroller = VideoPlayerController.network(widget.videoUrl);
     } else {
-      ycontroller = null;
-      if (widget.videoUrl.startsWith('http')) {
-        vcontroller = VideoPlayerController.network(widget.videoUrl);
-      } else {
-        vcontroller = VideoPlayerController.asset(
-            widget.videoUrl.isNotEmpty ? widget.videoUrl : 'assets/video/app_intro.mp4');
-      }
-
-      vcontroller!.initialize().then((_) {
-        if (!mounted) return;
-        setState(() {});
-        vcontroller!.play();
-        autoHide();
-      });
+      vcontroller = VideoPlayerController.asset(
+          widget.videoUrl.isNotEmpty ? widget.videoUrl : 'assets/video/app_intro.mp4');
     }
+
+    vcontroller!.initialize().then((_) {
+      if (!mounted) return;
+      setState(() {});
+      vcontroller!.play();
+      autoHide();
+    });
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
@@ -51,7 +32,6 @@ class VideoState extends State<Video> {
   @override
   void dispose() {
     vcontroller?.dispose();
-    ycontroller?.dispose();
     timer?.cancel();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitDown,
@@ -78,52 +58,39 @@ class VideoState extends State<Video> {
 
   @override
   Widget build(BuildContext context) {
-    if (isYoutube) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-            Center(
-              child: YoutubePlayer(
-                controller: ycontroller!,
-                aspectRatio: 16 / 9,
-              ),
-            ),
-            Positioned(
-              top: 40.0,
-              left: 20.0,
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30.0),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final aspectRatio = 0.75;
+    final aspectRatio = 16 / 9;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          if (vcontroller != null)
-            PlayerLifeCycle(
-              vcontroller!,
-              (BuildContext context, VideoPlayerController controller) =>
-                  AspectRatio(
-                    aspectRatio: aspectRatio,
-                    child: VideoPlayer(vcontroller!),
-                  ),
-            ),
+          if (vcontroller != null && vcontroller!.value.isInitialized)
+            Center(
+              child: AspectRatio(
+                aspectRatio: vcontroller!.value.aspectRatio,
+                child: VideoPlayer(vcontroller!),
+              ),
+            )
+          else
+            Center(child: CircularProgressIndicator()),
           GestureDetector(
-            child: PlayerControl(
-              vcontroller!,
-              visible: controlVisible,
-              title: widget.title,
-            ),
+            behavior: HitTestBehavior.translucent,
             onTap: handlerGesture,
+            child: vcontroller != null 
+              ? PlayerControl(
+                  vcontroller!,
+                  visible: controlVisible,
+                  title: widget.title,
+                )
+              : Container(),
+          ),
+          Positioned(
+            top: 40.0,
+            left: 20.0,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30.0),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
         ],
       ),
