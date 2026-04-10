@@ -177,15 +177,16 @@ class TvShowState extends State<TvShow> {
                                 fontSize: 12.0,
                               ),
                             ),
-                            Text(
-                              '${widget.item.seasons.length} seasons',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                color: Color.fromRGBO(255, 255, 255, 0.3),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 12.0,
+                            if (widget.item.seasons.length > 1)
+                              Text(
+                                '${widget.item.seasons.length} seasons',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(
+                                  color: Color.fromRGBO(255, 255, 255, 0.3),
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 12.0,
+                                ),
                               ),
-                            ),
                           ],
                         ),
                       ),
@@ -314,53 +315,53 @@ class TvShowState extends State<TvShow> {
                                 ],
                               ),
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 8.0),
-                              child: Container(
-                                child: Text(
-                                  'EPISODES',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 3,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                    color: Color.fromRGBO(255, 255, 255, 0.8),
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 15.0,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            TextButton(
-                              style: TextButton.styleFrom(padding: EdgeInsets.all(0.0)),
-                              onPressed: widget.item.seasons.length > 1
-                                  ? () => print('cambiando Season')
-                                  : null,
-                              child: Row(
-                                children: <Widget>[
-                                  Text(
-                                    'Season $currentSeason',
+                            if (seasonEpisodes.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.only(top: 8.0),
+                                child: Container(
+                                  child: Text(
+                                    seasonEpisodes.length > 1 ? 'EPISODES' : 'TRAILERS & CLIPS',
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 3,
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
-                                      color: Color.fromRGBO(255, 255, 255, 0.6),
-                                      fontWeight: FontWeight.w500,
+                                      color: Color.fromRGBO(255, 255, 255, 0.8),
+                                      fontWeight: FontWeight.w700,
                                       fontSize: 15.0,
                                     ),
                                   ),
-                                  (widget.item.seasons.length > 1
-                                      ? Padding(
-                                          padding: EdgeInsets.only(left: 8.0),
-                                          child: Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Color.fromRGBO(
-                                                255, 255, 255, 0.6),
-                                          ),
-                                        )
-                                      : Container())
-                                ],
+                                ),
                               ),
-                            ),
+                            if (widget.item.seasons.length > 1)
+                              TextButton(
+                                style: TextButton.styleFrom(padding: EdgeInsets.all(0.0)),
+                                onPressed: widget.item.seasons.length > 1
+                                    ? () => print('cambiando Season')
+                                    : null,
+                                child: Row(
+                                  children: <Widget>[
+                                    Text(
+                                      'Season $currentSeason',
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 3,
+                                      textAlign: TextAlign.left,
+                                      style: TextStyle(
+                                        color: Color.fromRGBO(255, 255, 255, 0.6),
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 15.0,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 8.0),
+                                      child: Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Color.fromRGBO(
+                                            255, 255, 255, 0.6),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
                           ],
                         ),
                       ),
@@ -370,7 +371,8 @@ class TvShowState extends State<TvShow> {
               ),
             ),
           ),
-          SliverList(
+          if (seasonEpisodes.isNotEmpty)
+            SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) => Container(
                     margin: EdgeInsets.only(bottom: 16.0),

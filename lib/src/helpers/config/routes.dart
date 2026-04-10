@@ -6,6 +6,7 @@ class Routes {
   static String detail = "/detail/:item";
   static String filter = "/filter/:title/:type";
   static String video = "/video/:title";
+  static String profile = "/profile";
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(handlerFunc:
@@ -18,5 +19,6 @@ class Routes {
     router.define(detail, handler: detailRouteHandler);
     router.define(filter, handler: filterRouteHandler);
     router.define(video, handler: trailerRouteHandler);
+    router.define(profile, handler: profileRouteHandler);
   }
 }

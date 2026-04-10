@@ -1,27 +1,48 @@
 part of marvel_cinema;
 
 class VideoState extends State<Video> {
-  late VideoPlayerController vcontroller;
+  late VideoPlayerController? vcontroller;
+  late YoutubePlayerController? ycontroller;
   late bool controlVisible;
   Timer? timer;
+  bool isYoutube = false;
 
   @override
   void initState() {
     controlVisible = true;
-    
-    if (widget.videoUrl.startsWith('http')) {
-      vcontroller = VideoPlayerController.network(widget.videoUrl);
-    } else {
-      vcontroller = VideoPlayerController.asset(
-          widget.videoUrl.isNotEmpty ? widget.videoUrl : 'assets/video/app_intro.mp4');
-    }
+    isYoutube = widget.videoUrl.contains('youtube.com') || widget.videoUrl.contains('youtu.be');
 
-    vcontroller.initialize().then((_) {
-      if (!mounted) return;
-      setState(() {});
-      vcontroller.play();
-      autoHide();
-    });
+    if (isYoutube) {
+      vcontroller = null;
+      final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
+      ycontroller = YoutubePlayerController(
+        initialVideoId: videoId ?? '',
+        flags: const YoutubePlayerFlags(
+          autoPlay: true,
+          mute: false,
+          disableDragSeek: false,
+          loop: false,
+          isLive: false,
+          forceHD: false,
+          enableCaption: true,
+        ),
+      );
+    } else {
+      ycontroller = null;
+      if (widget.videoUrl.startsWith('http')) {
+        vcontroller = VideoPlayerController.network(widget.videoUrl);
+      } else {
+        vcontroller = VideoPlayerController.asset(
+            widget.videoUrl.isNotEmpty ? widget.videoUrl : 'assets/video/app_intro.mp4');
+      }
+
+      vcontroller!.initialize().then((_) {
+        if (!mounted) return;
+        setState(() {});
+        vcontroller!.play();
+        autoHide();
+      });
+    }
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
       statusBarColor: Colors.transparent,
@@ -31,7 +52,8 @@ class VideoState extends State<Video> {
 
   @override
   void dispose() {
-    vcontroller.dispose();
+    vcontroller?.dispose();
+    ycontroller?.dispose();
     timer?.cancel();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitDown,
@@ -58,23 +80,52 @@ class VideoState extends State<Video> {
 
   @override
   Widget build(BuildContext context) {
+    if (isYoutube) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            Center(
+              child: YoutubePlayer(
+                controller: ycontroller!,
+                showVideoProgressIndicator: true,
+                progressIndicatorColor: Colors.redAccent,
+                onReady: () {
+                  // Ready
+                },
+              ),
+            ),
+            Positioned(
+              top: 40.0,
+              left: 20.0,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white, size: 30.0),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     final aspectRatio = 0.75;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
         fit: StackFit.expand,
         children: <Widget>[
-          PlayerLifeCycle(
-            vcontroller,
-            (BuildContext context, VideoPlayerController controller) =>
-                AspectRatio(
-                  aspectRatio: aspectRatio,
-                  child: VideoPlayer(vcontroller),
-                ),
-          ),
+          if (vcontroller != null)
+            PlayerLifeCycle(
+              vcontroller!,
+              (BuildContext context, VideoPlayerController controller) =>
+                  AspectRatio(
+                    aspectRatio: aspectRatio,
+                    child: VideoPlayer(vcontroller!),
+                  ),
+            ),
           GestureDetector(
             child: PlayerControl(
-              vcontroller,
+              vcontroller!,
               visible: controlVisible,
               title: widget.title,
             ),

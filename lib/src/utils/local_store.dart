@@ -3,6 +3,7 @@ part of marvel_cinema;
 class LocalStore {
   static const String _myListKey = 'my_list_ids';
   static const String _progressKey = 'continue_progress';
+  static const String _userNameKey = 'user_name';
 
   static Future<Set<int>> getMyList() async {
     final prefs = await SharedPreferences.getInstance();
@@ -41,5 +42,15 @@ class LocalStore {
       enc[key.toString()] = value.clamp(0.0, 1.0);
     });
     await prefs.setString(_progressKey, json.encode(enc));
+  }
+
+  static Future<String> getUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_userNameKey) ?? 'kaif';
+  }
+
+  static Future<void> setUserName(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userNameKey, name);
   }
 }

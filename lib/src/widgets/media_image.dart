@@ -7,7 +7,7 @@ Widget mediaImage(
   double? height,
 }) {
   final String safePath = (path ?? '').trim();
-  const String fallback = 'assets/images/default-image.png';
+  const String fallback = 'assets/images/app_logo.png';
 
   if (safePath.isEmpty) {
     return Image.asset(fallback, fit: fit, width: width, height: height);

@@ -34,3 +34,8 @@ var filterRouteHandler = Handler(
     );
   },
 );
+var profileRouteHandler = Handler(
+  handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+    return Profile(title: 'Profile');
+  },
+);

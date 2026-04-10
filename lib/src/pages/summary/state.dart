@@ -50,6 +50,14 @@ class SummaryState extends State<Summary> {
     await LocalStore.setProgress(next);
   }
 
+  void _navigateToProfile() {
+    Application.router.navigateTo(
+      context,
+      Routes.profile,
+      transition: TransitionType.inFromRight,
+    );
+  }
+
   String _heroImageForTab(String title) {
     switch (title) {
       case 'Search':
@@ -61,7 +69,7 @@ class SummaryState extends State<Summary> {
       case 'More':
         return 'screenshots/flutter_01.png';
       default:
-        return 'assets/images/1.jpg';
+        return 'screenshots/flutter_02.png';
     }
   }
 
@@ -450,10 +458,11 @@ class SummaryState extends State<Summary> {
           final data = snapshot.data!;
           final allResults = _flattenResults(data);
           
-          // Use the first item from the first section as our Hero, or fallback to constants
           final Result heroShow = allResults.isNotEmpty 
-              ? allResults.first 
-              : Result.fromJson(json.decode(json.encode(tvShow))); 
+                  ? allResults.first 
+                  : Result.fromJson(json.decode(json.encode(tvShow))); 
+          
+          final String heroImage = _heroImageForTab(widget.title);
           
           final List<Widget> sections = <Widget>[];
           if (widget.title != 'Search') {
@@ -524,10 +533,11 @@ class SummaryState extends State<Summary> {
             }
           }
 
+
           if (widget.title == 'Downloads') {
             sections.add(_buildInfoCard(
               'Smart Downloads',
-              'New episodes will be saved automatically for you.',
+              'New movies will be saved automatically for you.',
               Icons.download_done,
             ));
             sections.add(_buildGallerySection('Downloaded For You', [
@@ -538,21 +548,6 @@ class SummaryState extends State<Summary> {
           }
 
           if (widget.title == 'More') {
-            final List<String> assetsGallery = [
-              'assets/images/1.jpg',
-              'assets/images/2.jpg',
-              'assets/images/3.jpg',
-              'assets/images/end_game.jpg',
-              'assets/images/iron_man.jpg',
-              'assets/images/no_way_home.jpg',
-              'assets/images/love_and_thunder.jpg',
-              'assets/images/app_logo.png',
-              'assets/images/user.png',
-            ];
-
-            sections.add(
-              _buildGallerySection('App Assets', assetsGallery, height: 120),
-            );
             sections.add(_buildInfoCard(
               'Profile',
               'Switch profiles and manage your account settings.',
@@ -581,19 +576,21 @@ class SummaryState extends State<Summary> {
                               SizedBox(width: 16.0),
                               Icon(Icons.search, color: Colors.white),
                               SizedBox(width: 16.0),
-                              CircleAvatar(
-                                radius: 12.0,
-                                backgroundImage:
-                                    AssetImage('assets/images/user.png'),
+                              GestureDetector(
+                                onTap: _navigateToProfile,
+                                child: CircleAvatar(
+                                  radius: 12.0,
+                                  backgroundImage:
+                                      AssetImage('assets/images/user.png'),
+                                ),
                               ),
                             ],
                           ),
                         ],
                       )
                     : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          renderTitle('Series', 'Series'),
                           renderTitle('Movies', 'Movies'),
                           renderTitle('My-list', 'My List'),
                         ],
@@ -605,7 +602,7 @@ class SummaryState extends State<Summary> {
                       fit: StackFit.expand,
                       children: <Widget>[
                         widget.title == 'Home'
-                            ? HeroVideo()
+                            ? HeroVideo(videoUrl: heroShow.videoUrl)
                             : mediaImage(heroImage, fit: BoxFit.cover),
                         DecoratedBox(
                           decoration: BoxDecoration(
@@ -746,6 +743,8 @@ class SummaryState extends State<Summary> {
 }
 
 class HeroVideo extends StatefulWidget {
+  final String videoUrl;
+  HeroVideo({required this.videoUrl});
   @override
   _HeroVideoState createState() => _HeroVideoState();
 }
@@ -756,7 +755,12 @@ class _HeroVideoState extends State<HeroVideo> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset('assets/video/end_game.mp4');
+    if (widget.videoUrl.startsWith('assets/')) {
+      _controller = VideoPlayerController.asset(widget.videoUrl);
+    } else {
+      // Fallback to end_game if not a direct playable link (youtube needs a different player)
+      _controller = VideoPlayerController.asset('assets/video/end_game.mp4');
+    }
     _controller.setLooping(true);
     _controller.setVolume(0.0);
     _controller.initialize().then((_) {

@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // Plugins import...
 import 'package:fluro/fluro.dart';
 import 'package:video_player/video_player.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 // Router
 part 'src/helpers/config/constants.dart';
@@ -46,6 +47,8 @@ part 'src/pages/filter/index.dart';
 part 'src/pages/filter/state.dart';
 part 'src/pages/detail/index.dart';
 part 'src/pages/detail/state.dart';
+part 'src/pages/profile/index.dart';
+part 'src/pages/profile/state.dart';
 
 // Widgets
 part 'src/widgets/tvshow-list/index.dart';
