@@ -14,17 +14,15 @@ class VideoState extends State<Video> {
 
     if (isYoutube) {
       vcontroller = null;
-      final videoId = YoutubePlayer.convertUrlToId(widget.videoUrl);
-      ycontroller = YoutubePlayerController(
-        initialVideoId: videoId ?? '',
-        flags: const YoutubePlayerFlags(
-          autoPlay: true,
+      final videoId = YoutubePlayerController.convertUrlToId(widget.videoUrl);
+      ycontroller = YoutubePlayerController.fromVideoId(
+        videoId: videoId ?? '',
+        autoPlay: true,
+        params: const YoutubePlayerParams(
+          showControls: true,
+          showFullscreenButton: true,
           mute: false,
-          disableDragSeek: false,
           loop: false,
-          isLive: false,
-          forceHD: false,
-          enableCaption: true,
         ),
       );
     } else {
@@ -88,11 +86,7 @@ class VideoState extends State<Video> {
             Center(
               child: YoutubePlayer(
                 controller: ycontroller!,
-                showVideoProgressIndicator: true,
-                progressIndicatorColor: Colors.redAccent,
-                onReady: () {
-                  // Ready
-                },
+                aspectRatio: 16 / 9,
               ),
             ),
             Positioned(
