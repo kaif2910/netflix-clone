@@ -448,6 +448,7 @@ class SummaryState extends State<Summary> {
     return out;
   }
 
+  @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final String heroImage = _heroImageForTab(widget.title);
@@ -461,8 +462,6 @@ class SummaryState extends State<Summary> {
           final Result heroShow = allResults.isNotEmpty 
                   ? allResults.first 
                   : Result.fromJson(json.decode(json.encode(tvShow))); 
-          
-          final String heroImage = _heroImageForTab(widget.title);
           
           final List<Widget> sections = <Widget>[];
           if (widget.title != 'Search') {

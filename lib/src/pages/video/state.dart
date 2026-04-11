@@ -10,7 +10,7 @@ class VideoState extends State<Video> {
     controlVisible = true;
 
     if (widget.videoUrl.startsWith('http')) {
-      vcontroller = VideoPlayerController.network(widget.videoUrl);
+      vcontroller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl));
     } else {
       vcontroller = VideoPlayerController.asset(
           widget.videoUrl.isNotEmpty ? widget.videoUrl : 'assets/video/app_intro.mp4');
@@ -58,7 +58,6 @@ class VideoState extends State<Video> {
 
   @override
   Widget build(BuildContext context) {
-    final aspectRatio = 16 / 9;
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
