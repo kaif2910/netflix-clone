@@ -74,6 +74,7 @@ class TvShowState extends State<TvShow> {
                                 DeviceOrientation.landscapeRight,
                                 DeviceOrientation.landscapeLeft,
                               ]).then((e) {
+                                if (!mounted) return;
                                 Application.router.navigateTo(
                                   context,
                                   Routes.video.replaceAll(':title', widget.item.name),
@@ -413,6 +414,7 @@ class TvShowState extends State<TvShow> {
                                         DeviceOrientation.landscapeRight,
                                         DeviceOrientation.landscapeLeft,
                                       ]).then((e) {
+                                        if (!mounted) return;
                                         Application.router.navigateTo(
                                           context,
                                           Routes.video.replaceAll(':title', seasonEpisodes[index].name),
